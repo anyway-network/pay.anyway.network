@@ -16,6 +16,9 @@ function RootLayout({ children }: { children: React.ReactNode }) {
           href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap"
           rel="stylesheet"
         />
+        <link rel="icon" href="/logo.png" />
+        <link rel="icon" href="/logo.svg" />
+        <title>AnyWay Network</title>
       </head>
       <body className="bg-[#f5fff8]">
         <Providers>{children}</Providers>
