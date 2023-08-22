@@ -21,6 +21,7 @@ import {
   goerli,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+import Loader from "../components/loader";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
@@ -71,7 +72,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains} appInfo={demoAppInfo}>
-        {mounted && children}
+        {mounted ? children : <Loader />}
       </RainbowKitProvider>
     </WagmiConfig>
   );
