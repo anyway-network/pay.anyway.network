@@ -1,11 +1,12 @@
 "use client";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion, AnimatePresence } from "framer-motion";
-import { type } from "os";
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
+import { sendTransaction, waitForTransaction } from "@wagmi/core";
 function Page() {
   const { address, isConnected } = useAccount();
+  const { chain, chains } = useNetwork();
   type Data = {
     to: string;
     value: number;
@@ -31,9 +32,12 @@ function Page() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            token_from: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-            network_from: "Polygon",
-            network_to: "Avalanche",
+            token_from:
+              chain?.name === "Avalanche"
+                ? "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
+                : "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+            network_from: chain?.name,
+            network_to: chain?.name === "Avalanche" ? "Polygon" : "Avalanche",
             buy_amount: 10000,
             sender: address,
             recipient: address,
@@ -42,13 +46,54 @@ function Page() {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setLoading(false);
+      if (data.detail) {
+        alert(data.detail);
+        return;
+      }
       setData(data);
       setStep("payment");
     } else {
       alert("Please connect your wallet");
     }
   }
+  async function purchase() {
+    if (data) {
+      try {
+        setLoading(true);
+        let tx = await sendTransaction({
+          chainId: data.chainId,
+          nonce: data.nonce, // convert to bigint
+          to: data.to,
+          gasPrice: BigInt(data.gasPrice), // convert to bigint
+          gas: BigInt(data.gas), // convert to bigint
+          value: BigInt(data.value), // convert to bigint
+          //@ts-ignore
+          data: data.data, // add '0x' prefix to data string
+        });
+        await waitForTransaction({
+          chainId: data.chainId,
+          hash: tx.hash,
+        });
+        setStep("done");
+      } catch (e) {
+        console.log(e);
+        //@ts-ignore
+        if (e.toString().includes("ChainMismatchError")) {
+          alert("Please switch network");
+        }
+        //@ts-ignore
+        else if (e.toString().includes("TransactionExecutionError")) {
+          alert("Transaction failed");
+        } else {
+          alert("Unknown error");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
   return (
     <>
       <div className="flex justify-between items-center p-3 sticky top-0 backdrop-blur bg-[#f5fff8] bg-opacity-90">
@@ -81,7 +126,7 @@ function Page() {
               <motion.h2 className="text-2xl font-logo mt-3">
                 iPhone 15 Pro
               </motion.h2>
-              <motion.h3 className="font-logo mt-1">$1.00 USDC</motion.h3>
+              <motion.h3 className="font-logo mt-1">$0.01 USDC</motion.h3>
               <ul className="mt-2 list-disc px-4">
                 <li className="font-bold">Demo</li>
                 <li>6.1-inch Super Retina XDR display</li>
@@ -137,11 +182,14 @@ function Page() {
                   <motion.h2 className="text-2xl font-logo">
                     iPhone 15 Pro
                   </motion.h2>
-                  <motion.h3 className="font-logo mt-1">$1.00 USDC</motion.h3>
+                  <motion.h3 className="font-logo mt-1">$0.01 USDC</motion.h3>
                 </div>
               </div>
-              <motion.button className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2">
-                Pay {(data.sell_amount * 0.000001).toFixed(4)} USDC
+              <motion.button
+                className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
+                onClick={() => purchase()}
+              >
+                Pay ${(data.sell_amount * 0.000001).toFixed(4)} USDC
               </motion.button>
             </div>
             <p className="text-sm text-[#5b9763] mt-2 opacity-50 px-4 text-center">
@@ -165,6 +213,40 @@ function Page() {
               <div>{data.gasPrice}</div>
               <div className="font-bold">Nonce</div>
               <div>{data.nonce}</div>
+            </div>
+          </motion.div>
+        )}
+        {step === "done" && data && (
+          <motion.div
+            initial={{ opacity: 0, x: 200 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.25 }}
+            className="flex flex-col mx-auto w-[95vw] max-w-[512px] my-8"
+            key={3}
+          >
+            <h1 className="text-4xl font-logo font-bold p-4 pb-2">Done</h1>
+            <div className="flex flex-col bg-[#76c481] bg-opacity-10 rounded-2xl p-4 border border-[#76c481] border-opacity-20">
+              <h1 className="text-2xl font-logo">Payment Successful</h1>
+              <p className="mt-2">
+                Your payment has been successfully processed.
+              </p>
+            </div>
+            <div className="flex flex-col bg-[#76c481] bg-opacity-10 rounded-2xl p-4 border border-[#76c481] border-opacity-20 mt-2">
+              <div className="flex gap-4 items-center">
+                <motion.div className="bg-white p-3 flex items-center justify-center rounded-lg border border-[#76c481] border-opacity-20 h-20 w-20">
+                  <img
+                    src="/iphone-compare-iphone-14-pro-202209.jpeg"
+                    className="h-full w-full object-contain"
+                    alt="product"
+                  />
+                </motion.div>
+                <div>
+                  <motion.h2 className="text-2xl font-logo">
+                    iPhone 15 Pro
+                  </motion.h2>
+                  <motion.h3 className="font-logo mt-1">$0.01 USDC</motion.h3>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
