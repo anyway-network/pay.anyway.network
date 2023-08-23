@@ -1,14 +1,25 @@
 "use client";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion, AnimatePresence } from "framer-motion";
+import { type } from "os";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 function Page() {
   const { address, isConnected } = useAccount();
-
+  type Data = {
+    to: string;
+    value: number;
+    gas: number;
+    chainId: number;
+    sell_amount: number;
+    price: string;
+    gasPrice: number;
+    nonce: number;
+    data: string;
+  };
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("product");
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<Data | null>(null);
   async function getCallbackData() {
     if (isConnected) {
       setLoading(true);
@@ -104,7 +115,7 @@ function Page() {
             </div>
           </motion.div>
         )}
-        {step === "payment" && (
+        {step === "payment" && data && (
           <motion.div
             initial={{ opacity: 0, x: 200 }}
             animate={{ opacity: 1, x: 0 }}
@@ -130,11 +141,30 @@ function Page() {
                 </div>
               </div>
               <motion.button className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2">
-                Pay $1,000
+                Pay {(data.sell_amount * 0.000001).toFixed(4)} USDC
               </motion.button>
-              <p className="text-sm text-[#5b9763] mt-2 opacity-50">
-                Any transaction fees will be deducted from the payment amount.
-              </p>
+            </div>
+            <p className="text-sm text-[#5b9763] mt-2 opacity-50 px-4 text-center">
+              Any transaction fees will be deducted from the payment amount.
+            </p>
+
+            <div className="grid grid-cols-[8em_1fr] gap-2 mt-4 px-4 text-sm text-[#5b9763] opacity-50 hover:opacity-80">
+              <div className="font-bold">To</div>
+              <div>{data.to}</div>
+              <div className="font-bold">Value</div>
+              <div>{data.value}</div>
+              <div className="font-bold">Gas</div>
+              <div>{data.gas}</div>
+              <div className="font-bold">Chain ID</div>
+              <div>{data.chainId}</div>
+              <div className="font-bold">Sell Amount</div>
+              <div>{data.sell_amount}</div>
+              <div className="font-bold">Price</div>
+              <div>{data.price}</div>
+              <div className="font-bold">Gas Price</div>
+              <div>{data.gasPrice}</div>
+              <div className="font-bold">Nonce</div>
+              <div>{data.nonce}</div>
             </div>
           </motion.div>
         )}
