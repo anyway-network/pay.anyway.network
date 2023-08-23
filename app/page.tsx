@@ -222,12 +222,19 @@ function Page() {
                   <motion.h3 className="font-logo mt-1">$0.01 USDC</motion.h3>
                 </div>
               </div>
-              <motion.button
-                className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
-                onClick={() => purchase()}
-              >
-                Pay ${(data.sell_amount * 0.000001).toFixed(4)} USDC
-              </motion.button>
+              {!loading && (
+                <motion.button
+                  className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
+                  onClick={() => purchase()}
+                >
+                  Pay ${(data.sell_amount * 0.000001).toFixed(4)} USDC
+                </motion.button>
+              )}
+              {loading && (
+                <motion.button className="w-full bg-[#5b9763] bg-opacity-80 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2">
+                  <div className="h-6 w-6 rounded-full border-2 border-white border-b-transparent animate-spin"></div>
+                </motion.button>
+              )}
             </div>
             <p className="text-sm text-[#5b9763] mt-2 opacity-50 px-4 text-center">
               Any transaction fees will be deducted from the payment amount.
