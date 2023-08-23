@@ -26,6 +26,7 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("product");
   const [data, setData] = useState<Data | null>(null);
+  const [hash, setHash] = useState("");
   async function getCallbackData() {
     if (isConnected) {
       setLoading(true);
@@ -108,6 +109,7 @@ function Page() {
           //@ts-ignore
           data: data.data, // add '0x' prefix to data string
         });
+        setHash(tx.hash);
         await waitForTransaction({
           chainId: data.chainId,
           hash: tx.hash,
@@ -240,7 +242,7 @@ function Page() {
               Any transaction fees will be deducted from the payment amount.
             </p>
 
-            <div className="grid grid-cols-[8em_1fr] gap-2 mt-4 px-4 text-sm text-[#5b9763] opacity-50 hover:opacity-80">
+            <div className="grid grid-cols-[8em_1fr] gap-2 mt-4 px-4 text-sm text-[#5b9763] opacity-30 hover:opacity-80 transition-opacity">
               <div className="font-bold">To</div>
               <div>{data.to}</div>
               <div className="font-bold">Value</div>
@@ -291,6 +293,27 @@ function Page() {
                   <motion.h3 className="font-logo mt-1">$0.01 USDC</motion.h3>
                 </div>
               </div>
+            </div>
+            <div className="grid grid-cols-[8em_1fr] gap-2 mt-4 px-4 text-sm text-[#5b9763] opacity-30 hover:opacity-80 transition-opacity">
+              <div className="font-bold">To</div>
+              <div>{address}</div>
+              <div className="font-bold">Value</div>
+              <div>{data.value}</div>
+              {chain?.blockExplorers?.default && (
+                <>
+                  <div className="font-bold">Explorer</div>
+                  <div>
+                    <a
+                      href={`${chain?.blockExplorers?.default}/tx/${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline"
+                    >
+                      Explorer 🔗
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           </motion.div>
         )}
