@@ -2,8 +2,13 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { useAccount, useNetwork } from "wagmi";
-import { sendTransaction, waitForTransaction } from "@wagmi/core";
+import { useAccount, useNetwork, erc20ABI } from "wagmi";
+import {
+  sendTransaction,
+  waitForTransaction,
+  readContract,
+  writeContract,
+} from "@wagmi/core";
 function Page() {
   const { address, isConnected } = useAccount();
   const { chain, chains } = useNetwork();
@@ -61,6 +66,38 @@ function Page() {
     if (data) {
       try {
         setLoading(true);
+        // check allowance
+        //@ts-ignore
+        let allowance = await readContract({
+          chainId: data.chainId,
+          //@ts-ignore
+          address:
+            chain?.name === "Avalanche"
+              ? "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
+              : "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          functionName: "allowance",
+          abi: erc20ABI,
+          //@ts-ignore
+          args: [address, data.to],
+        });
+        console.log(allowance);
+        //@ts-ignore
+        if (allowance < data.sell_amount) {
+          // approve
+          await writeContract({
+            chainId: data.chainId,
+            //@ts-ignore
+            address:
+              chain?.name === "Avalanche"
+                ? "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
+                : "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+            method: "approve",
+            functionName: "approve",
+            //@ts-ignore
+            args: [data.to, data.sell_amount],
+            abi: erc20ABI,
+          });
+        }
         let tx = await sendTransaction({
           chainId: data.chainId,
           nonce: data.nonce, // convert to bigint
@@ -77,7 +114,7 @@ function Page() {
         });
         setStep("done");
       } catch (e) {
-        console.log(e);
+        console.error(e);
         //@ts-ignore
         if (e.toString().includes("ChainMismatchError")) {
           alert("Please switch network");
