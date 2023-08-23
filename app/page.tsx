@@ -299,12 +299,12 @@ function Page() {
               <div>{address}</div>
               <div className="font-bold">Value</div>
               <div>{data.value}</div>
-              {chain?.blockExplorers?.default && (
+              {chain?.blockExplorers?.default?.url && (
                 <>
                   <div className="font-bold">Explorer</div>
                   <div>
                     <a
-                      href={`${chain?.blockExplorers?.default}/tx/${hash}`}
+                      href={`${chain?.blockExplorers?.default?.url}/tx/${hash}`}
                       target="_blank"
                       rel="noreferrer"
                       className="underline"
