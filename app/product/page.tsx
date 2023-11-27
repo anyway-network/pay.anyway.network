@@ -77,6 +77,26 @@ function Page() {
       alert("Please connect your wallet");
     }
   }
+  function getContractAddressByChainName(chainName: string) {
+    switch (chainName) {
+      case "Avalanche":
+        return "0xfBE4F974044ADf128435883B081b240760BA895c";
+      case "Polygon":
+        return "0x060d24153aBfa8D6759f0ede86E64f97564834f0";
+      case "Arbitrum":
+        return "0x060d24153aBfa8D6759f0ede86E64f97564834f0";
+      case "Optimism":
+        return "0x4026afa7da43768d03A3Dbb3CD5F6b92a1bd86C5";
+      case "BSC":
+        return "0x133511bCb5F7Be8b008C713D208d31C9901Aa934";
+      case "Goerli":
+        return "0xd27D8BE950aCA62efCD0Ef83eB148305D39225EB";
+      case "Mumbai":
+        return "0x49b7f7B5D9B6A8D8B09C66212D183762D2634991";
+      default:
+        return "";
+    }
+  }
   async function purchase() {
     if (data) {
       try {
@@ -86,10 +106,7 @@ function Page() {
         let allowance = await readContract({
           chainId: data.chainId,
           //@ts-ignore
-          address:
-            chain?.name === "Avalanche"
-              ? "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
-              : "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          address: getContractAddressByChainName(chain?.name),
           functionName: "allowance",
           abi: erc20ABI,
           //@ts-ignore
@@ -102,10 +119,7 @@ function Page() {
           await writeContract({
             chainId: data.chainId,
             //@ts-ignore
-            address:
-              chain?.name === "Avalanche"
-                ? "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
-                : "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+            address: getContractAddressByChainName(chain?.name),
             method: "approve",
             functionName: "approve",
             //@ts-ignore
