@@ -16,7 +16,7 @@
       "poolid": 7
     }
   },
-  "BSC": {
+  "BNB Smart Chain": {
     "busd": {
       "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
       "decimals": 18,
@@ -50,7 +50,7 @@
       "poolid": 3
     }
   },
-  "Arbitrum": {
+  "Arbitrum One": {
     "usdc": {
       "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
       "decimals": 6,
@@ -72,7 +72,7 @@
       "poolid": 7
     }
   },
-  "Optimism": {
+  "OP Mainnet": {
     "usdc": {
       "address": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
       "decimals": 6,
@@ -116,7 +116,7 @@
       "poolid": 2
     }
   },
-  "Mumbai": {
+  "Polygon Mumbai": {
     "usdc": {
       "address": "0x742DfA5Aa70a8212857966D491D67B09Ce7D6ec7",
       "decimals": 6,
