@@ -186,7 +186,7 @@ function Page() {
         <div className="text-2xl font-bold flex items-center gap-2 font-logo text-[#5b9763]">
           <img src="/logo.svg" className="w-10 h-10 inline-block" alt="logo" />
           <span className="hidden md:inline-block">AnyWay Network</span>
-          <span className=" md:hidden">AnyWay</span>
+          <span className="md:hidden">AnyWay</span>
         </div>
         <ConnectButton />
       </div>
@@ -219,42 +219,46 @@ function Page() {
               <pre>
                 <code>{JSON.stringify(recipientData, null, 2)}</code>
               </pre>
-              <label className="text-sm text-[#5b9763] mt-2">
-                Payment Token
-              </label>
-              <select
-                value={paymentToken}
-                onChange={(e) => {
-                  let token =
-                    //@ts-ignore
-                    Object.entries(tokenList[chain?.name]).filter(
+              {chain?.name && (
+                <>
+                  <label className="text-sm text-[#5b9763] mt-2">
+                    Payment Token
+                  </label>
+                  <select
+                    value={paymentToken}
+                    onChange={(e) => {
+                      let token =
+                        //@ts-ignore
+                        Object.entries(tokenList[chain?.name]).filter(
+                          //@ts-ignore
+                          ([token, detail]) => detail.address === e.target.value
+                        )[0];
+                      setPaymentToken(e.target.value);
+                      setPaymentTokenData({
+                        name: token[0],
+                        //@ts-ignore
+                        ...token[1],
+                      });
+                    }}
+                    className="bg-[#5b9763] bg-opacity-10 rounded-lg mt-1 p-3 text-black flex items-center justify-center gap-2"
+                  >
+                    <option value="" disabled>
+                      Select Payment Token
+                    </option>
+                    {
                       //@ts-ignore
-                      ([token, detail]) => detail.address === e.target.value
-                    )[0];
-                  setPaymentToken(e.target.value);
-                  setPaymentTokenData({
-                    name: token[0],
-                    //@ts-ignore
-                    ...token[1],
-                  });
-                }}
-                className="bg-[#5b9763] bg-opacity-10 rounded-lg mt-1 p-3 text-black flex items-center justify-center gap-2"
-              >
-                <option value="" disabled>
-                  Select Payment Token
-                </option>
-                {
-                  //@ts-ignore
-                  Object.entries(tokenList[chain?.name]).map(
-                    ([token, detail]) => (
-                      //@ts-ignore
-                      <option value={detail.address} key={token}>
-                        {token.toUpperCase()}
-                      </option>
-                    )
-                  )
-                }
-              </select>
+                      Object.entries(tokenList[chain?.name]).map(
+                        ([token, detail]) => (
+                          //@ts-ignore
+                          <option value={detail.address} key={token}>
+                            {token.toUpperCase()}
+                          </option>
+                        )
+                      )
+                    }
+                  </select>
+                </>
+              )}
               {!loading && (
                 <motion.button
                   className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
@@ -269,6 +273,9 @@ function Page() {
                   />{" "}
                   <span className="font-logo">AnyWay</span>
                 </motion.button>
+              )}
+              {!chain?.name && !paymentToken && (
+                <p className="text-center">Please connect your wallet.</p>
               )}
               {loading && (
                 <motion.button className="w-full bg-[#5b9763] bg-opacity-80 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2">
