@@ -116,7 +116,7 @@ function Page() {
         let allowance = await readContract({
           chainId: data.chainId,
           //@ts-ignore
-          address: getContractAddressByChainName(chain?.name),
+          address: paymentToken,
           functionName: "allowance",
           abi: erc20ABI,
           //@ts-ignore
