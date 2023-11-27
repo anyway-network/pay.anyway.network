@@ -46,6 +46,16 @@ function Page() {
   async function getCallbackData() {
     if (isConnected && recipientData) {
       setLoading(true);
+      let productId = new URLSearchParams(location.search).get("id");
+      const { _id: paymentId } = await fetch(
+        `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/transaction/payment/${productId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => res.json());
       const res = await fetch(
         "https://tbh-api.anyway.network/query_fees_and_calldata",
         {
@@ -61,7 +71,7 @@ function Page() {
             buy_amount: productData.price * 10 ** paymentTokenData.decimals,
             sender: address,
             recipient: recipientData.address!,
-            paymentId: Math.random().toString(36).substring(7),
+            paymentId,
           }),
         }
       );
