@@ -354,8 +354,6 @@ function Page() {
               <div>{data.chainId}</div>
               <div className="font-bold">Sell Amount</div>
               <div>{data.sell_amount}</div>
-              <div className="font-bold">Price</div>
-              <div>{data.price}</div>
               <div className="font-bold">Gas Price</div>
               <div>{data.gasPrice}</div>
               <div className="font-bold">Nonce</div>
