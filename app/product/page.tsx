@@ -43,6 +43,7 @@ function Page() {
     nickname: string;
   } | null>(null);
   const [hash, setHash] = useState("");
+  const [needApprove, setNeedApprove] = useState(false);
   async function getCallbackData() {
     if (isConnected && recipientData) {
       setLoading(true);
@@ -76,6 +77,23 @@ function Page() {
         }
       );
       const data = await res.json();
+      let allowance = await readContract({
+        chainId: data.chainId,
+        //@ts-ignore
+        address: paymentToken,
+        functionName: "allowance",
+        abi: erc20ABI,
+        //@ts-ignore
+        args: [address, data.to],
+      });
+      console.log(allowance);
+      //@ts-ignore
+      if (allowance < data.sell_amount) {
+        // approve
+        setNeedApprove(true);
+      }
+
+
       setLoading(false);
       if (data.detail) {
         alert(data.detail);
@@ -87,36 +105,50 @@ function Page() {
       alert("Please connect your wallet");
     }
   }
+
+  async function getApprove() {
+    if (data) {
+      try {
+        setLoading(true);
+        let approve = await writeContract({
+          chainId: data.chainId,
+          //@ts-ignore
+          address: paymentToken,
+          method: "approve",
+          functionName: "approve",
+          //@ts-ignore
+          args: [data.to, data.sell_amount],
+          abi: erc20ABI,
+        });
+        await waitForTransaction({
+          chainId: data.chainId,
+          hash: approve.hash,
+        });
+        setNeedApprove(false);
+      } catch (e) {
+        console.error(e);
+        //@ts-ignore
+        if (e.toString().includes("ChainMismatchError")) {
+          alert("Please switch network");
+        }
+        //@ts-ignore
+        else if (e.toString().includes("TransactionExecutionError")) {
+          alert("Transaction failed");
+        } else {
+          alert("Unknown error");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
+
   async function purchase() {
     if (data) {
       try {
         setLoading(true);
-        // check allowance
-        //@ts-ignore
-        let allowance = await readContract({
-          chainId: data.chainId,
-          //@ts-ignore
-          address: paymentToken,
-          functionName: "allowance",
-          abi: erc20ABI,
-          //@ts-ignore
-          args: [address, data.to],
-        });
-        console.log(allowance);
-        //@ts-ignore
-        if (allowance < data.sell_amount) {
-          // approve
-          await writeContract({
-            chainId: data.chainId,
-            //@ts-ignore
-            address: paymentToken,
-            method: "approve",
-            functionName: "approve",
-            //@ts-ignore
-            args: [data.to, data.sell_amount],
-            abi: erc20ABI,
-          });
-        }
+        
         let tx = await sendTransaction({
           chainId: data.chainId,
           nonce: data.nonce, // convert to bigint
@@ -318,6 +350,27 @@ function Page() {
                 </div>
               </div>
               {!loading && (
+                <>
+                {needApprove ? (
+                  <motion.button
+                  className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
+                  onClick={() => getApprove()}
+                >
+                  Approve{" "}
+                  {(data.sell_amount / 10 ** paymentTokenData.decimals).toFixed(
+                    4
+                  )}{" "}
+                  {
+                    //@ts-ignore
+                    Object.entries(tokenList[chain?.name])
+                      .filter(
+                        //@ts-ignore
+                        ([token, detail]) => detail.address === paymentToken
+                      )[0][0]
+                      .toUpperCase()
+                  }
+                </motion.button>
+                ) : (
                 <motion.button
                   className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
                   onClick={() => purchase()}
@@ -336,6 +389,8 @@ function Page() {
                       .toUpperCase()
                   }
                 </motion.button>
+                )}
+                </>
               )}
               {loading && (
                 <motion.button className="w-full bg-[#5b9763] bg-opacity-80 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2">
