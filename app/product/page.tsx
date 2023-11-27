@@ -3,19 +3,18 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useAccount, useNetwork, erc20ABI } from "wagmi";
-import { useParams } from "next/navigation";
 import {
   sendTransaction,
   waitForTransaction,
   readContract,
   writeContract,
 } from "@wagmi/core";
-import tokenList from "../../../assets/buy_token_list.json";
+import tokenList from "../../assets/buy_token_list.json";
 
 function Page() {
   const { address, isConnected } = useAccount();
   const { chain, chains } = useNetwork();
-  const params = useParams();
+
   type Data = {
     to: string;
     value: number;
@@ -149,7 +148,8 @@ function Page() {
   }
   async function fetchProductData() {
     setLoading(true);
-    let productId = params.id;
+    // get product id from query params
+    let productId = new URLSearchParams(location.search).get("id");
     let res = await fetch(
       `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/product/${productId}`
     );
