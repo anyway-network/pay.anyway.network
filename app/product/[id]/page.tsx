@@ -29,6 +29,7 @@ function Page() {
   };
   const [loading, setLoading] = useState(false);
   const [paymentToken, setPaymentToken] = useState("");
+  const [paymentTokenData, setPaymentTokenData] = useState<any>(null);
   const [step, setStep] = useState("product");
   const [data, setData] = useState<Data | null>(null);
   const [productData, setProductData] = useState<any>(null);
@@ -55,12 +56,13 @@ function Page() {
           },
           body: JSON.stringify({
             token_from: paymentToken,
+            token_to: recipientData.token_address,
             network_from: chain?.name,
             network_to: recipientData.network!,
-            buy_amount: productData.price,
+            buy_amount: productData.price * 10 ** paymentTokenData.decimals,
             sender: address,
             recipient: recipientData.address!,
-            paymentId: "vytxeTZskVKR7C7WgdSP3d",
+            paymentId: Math.random().toString(36).substring(7),
           }),
         }
       );
@@ -222,7 +224,20 @@ function Page() {
               </label>
               <select
                 value={paymentToken}
-                onChange={(e) => setPaymentToken(e.target.value)}
+                onChange={(e) => {
+                  let token =
+                    //@ts-ignore
+                    Object.entries(tokenList[chain?.name]).filter(
+                      //@ts-ignore
+                      ([token, detail]) => detail.address === e.target.value
+                    )[0];
+                  setPaymentToken(e.target.value);
+                  setPaymentTokenData({
+                    name: token[0],
+                    //@ts-ignore
+                    ...token[1],
+                  });
+                }}
                 className="bg-[#5b9763] bg-opacity-10 rounded-lg mt-1 p-3 text-black flex items-center justify-center gap-2"
               >
                 <option value="" disabled>
@@ -230,10 +245,10 @@ function Page() {
                 </option>
                 {
                   //@ts-ignore
-                  Object.entries(tokenList[recipientData.network!]).map(
+                  Object.entries(tokenList[chain?.name]).map(
                     ([token, detail]) => (
                       //@ts-ignore
-                      <option value={detail.address}>
+                      <option value={detail.address} key={token}>
                         {token.toUpperCase()}
                       </option>
                     )
@@ -274,10 +289,10 @@ function Page() {
             <h1 className="text-4xl font-logo font-bold p-4 pb-2">Payment</h1>
             <div className="flex flex-col bg-[#76c481] bg-opacity-10 rounded-2xl p-4 border border-[#76c481] border-opacity-20">
               <div className="flex gap-4 items-center">
-                <motion.div className="bg-white p-3 flex items-center justify-center rounded-lg border border-[#76c481] border-opacity-20 h-20 w-20">
+                <motion.div className="bg-white flex items-center justify-center rounded-lg border border-[#76c481] border-opacity-20 h-20 w-20">
                   <img
                     src={productData?.image_url}
-                    className="h-full w-full object-contain"
+                    className="h-full w-full object-cover rounded-lg"
                     alt="product"
                   />
                 </motion.div>
@@ -296,7 +311,19 @@ function Page() {
                   className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
                   onClick={() => purchase()}
                 >
-                  Pay ${(data.sell_amount * 0.000001).toFixed(4)} USDC
+                  Pay $
+                  {(data.sell_amount / 10 ** paymentTokenData.decimals).toFixed(
+                    4
+                  )}{" "}
+                  {
+                    //@ts-ignore
+                    Object.entries(tokenList[chain?.name])
+                      .filter(
+                        //@ts-ignore
+                        ([token, detail]) => detail.address === paymentToken
+                      )[0][0]
+                      .toUpperCase()
+                  }
                 </motion.button>
               )}
               {loading && (
@@ -346,10 +373,10 @@ function Page() {
             </div>
             <div className="flex flex-col bg-[#76c481] bg-opacity-10 rounded-2xl p-4 border border-[#76c481] border-opacity-20 mt-2">
               <div className="flex gap-4 items-center">
-                <motion.div className="bg-white p-3 flex items-center justify-center rounded-lg border border-[#76c481] border-opacity-20 h-20 w-20">
+                <motion.div className="bg-white flex items-center justify-center rounded-lg border border-[#76c481] border-opacity-20 h-20 w-20">
                   <img
                     src={productData?.image_url}
-                    className="h-full w-full object-contain"
+                    className="h-full w-full object-cover rounded-lg"
                     alt="product"
                   />
                 </motion.div>
