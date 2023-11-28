@@ -93,7 +93,6 @@ function Page() {
         setNeedApprove(true);
       }
 
-
       setLoading(false);
       if (data.detail) {
         alert(data.detail);
@@ -143,12 +142,11 @@ function Page() {
     }
   }
 
-
   async function purchase() {
     if (data) {
       try {
         setLoading(true);
-        
+
         let tx = await sendTransaction({
           chainId: data.chainId,
           nonce: data.nonce, // convert to bigint
@@ -351,45 +349,31 @@ function Page() {
               </div>
               {!loading && (
                 <>
-                {needApprove ? (
-                  <motion.button
-                  className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
-                  onClick={() => getApprove()}
-                >
-                  Approve{" "}
-                  {(data.sell_amount / 10 ** paymentTokenData.decimals).toFixed(
-                    4
-                  )}{" "}
-                  {
-                    //@ts-ignore
-                    Object.entries(tokenList[chain?.name])
-                      .filter(
-                        //@ts-ignore
-                        ([token, detail]) => detail.address === paymentToken
-                      )[0][0]
-                      .toUpperCase()
-                  }
-                </motion.button>
-                ) : (
-                <motion.button
-                  className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
-                  onClick={() => purchase()}
-                >
-                  Pay $
-                  {(data.sell_amount / 10 ** paymentTokenData.decimals).toFixed(
-                    4
-                  )}{" "}
-                  {
-                    //@ts-ignore
-                    Object.entries(tokenList[chain?.name])
-                      .filter(
-                        //@ts-ignore
-                        ([token, detail]) => detail.address === paymentToken
-                      )[0][0]
-                      .toUpperCase()
-                  }
-                </motion.button>
-                )}
+                  {needApprove ? (
+                    <motion.button
+                      className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
+                      onClick={() => getApprove()}
+                    >
+                      Approve{" "}
+                      {(
+                        data.sell_amount /
+                        10 ** paymentTokenData.decimals
+                      ).toFixed(4)}{" "}
+                      {paymentTokenData.name.toUpperCase()}
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      className="w-full bg-[#5b9763] hover:bg-opacity-80 active:bg-opacity-90 rounded-lg mt-3 p-3 text-white flex items-center justify-center gap-2"
+                      onClick={() => purchase()}
+                    >
+                      Pay $
+                      {(
+                        data.sell_amount /
+                        10 ** paymentTokenData.decimals
+                      ).toFixed(4)}{" "}
+                      {paymentTokenData.name.toUpperCase()}
+                    </motion.button>
+                  )}
                 </>
               )}
               {loading && (
