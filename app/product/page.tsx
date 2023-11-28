@@ -250,9 +250,6 @@ function Page() {
                 ${productData.price} {productData.token_name}
               </motion.h3>
               <p>{productData.description}</p>
-              <pre>
-                <code>{JSON.stringify(recipientData, null, 2)}</code>
-              </pre>
               {chain?.name && (
                 <>
                   <label className="text-sm text-[#5b9763] mt-2">
