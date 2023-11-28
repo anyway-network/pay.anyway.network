@@ -3,6 +3,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useAccount, useNetwork, erc20ABI } from "wagmi";
+import MarkdownViewer from "../../components/MarkdownViewer";
 import {
   sendTransaction,
   waitForTransaction,
@@ -249,7 +250,7 @@ function Page() {
               <motion.h3 className="font-logo mt-1">
                 ${productData.price} {productData.token_name}
               </motion.h3>
-              <p>{productData.description}</p>
+              <MarkdownViewer content={productData.description} />
               {chain?.name && (
                 <>
                   <label className="text-sm text-[#5b9763] mt-2">
