@@ -28,6 +28,7 @@ function Page() {
     data: string;
   };
   const [loading, setLoading] = useState(false);
+  const [transactionId, setTransactionId] = useState("");
   const [paymentToken, setPaymentToken] = useState("");
   const [paymentTokenData, setPaymentTokenData] = useState<any>(null);
   const [step, setStep] = useState("product");
@@ -58,6 +59,7 @@ function Page() {
           },
         }
       ).then((res) => res.json());
+      setTransactionId(paymentId);
       const res = await fetch(
         "https://tbh-api.anyway.network/query_fees_and_calldata",
         {
@@ -159,6 +161,18 @@ function Page() {
           data: data.data, // add '0x' prefix to data string
         });
         setHash(tx.hash);
+        await fetch(
+          `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/transaction/${transactionId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tx_id: tx.hash,
+            }),
+          }
+        );
         await waitForTransaction({
           chainId: data.chainId,
           hash: tx.hash,
