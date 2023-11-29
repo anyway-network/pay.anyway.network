@@ -51,7 +51,7 @@ function Page() {
       setLoading(true);
       let productId = new URLSearchParams(location.search).get("id");
       const { _id: paymentId } = await fetch(
-        `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/transaction/payment/${productId}`,
+        `https://api.anyway.network/api/transaction/payment/${productId}`,
         {
           method: "POST",
           headers: {
@@ -162,7 +162,7 @@ function Page() {
         });
         setHash(tx.hash);
         await fetch(
-          `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/transaction/${transactionId}`,
+          `https://api.anyway.network/api/transaction/${transactionId}`,
           {
             method: "PATCH",
             headers: {
@@ -200,12 +200,12 @@ function Page() {
     // get product id from query params
     let productId = new URLSearchParams(location.search).get("id");
     let res = await fetch(
-      `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/product/${productId}`
+      `https://api.anyway.network/api/product/${productId}`
     );
     let data = await res.json();
 
     let recipientRes = await fetch(
-      `https://anyway-backend-transaction-oq7yqdggzq-de.a.run.app/api/recipient/${data.recipient_id}`
+      `https://api.anyway.network/api/recipient/${data.recipient_id}`
     );
     let recipientResData = await recipientRes.json();
     setLoading(false);
