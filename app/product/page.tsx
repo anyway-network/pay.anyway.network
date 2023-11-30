@@ -174,6 +174,7 @@ function Page() {
                 recipientData?.network === chain?.name
                   ? "same_chain"
                   : "cross_chain",
+              chain_id: chain?.id,
             }),
           }
         );
