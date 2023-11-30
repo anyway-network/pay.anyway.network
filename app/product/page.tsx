@@ -298,14 +298,16 @@ function Page() {
                     </option>
                     {
                       //@ts-ignore
-                      Object.entries(tokenList[chain?.name]).map(
-                        ([token, detail]) => (
-                          //@ts-ignore
-                          <option value={detail.address} key={token}>
-                            {token.toUpperCase()}
-                          </option>
+                      tokenList[chain?.name] &&
+                        //@ts-ignore
+                        Object.entries(tokenList[chain?.name]).map(
+                          ([token, detail]) => (
+                            //@ts-ignore
+                            <option value={detail.address} key={token}>
+                              {token.toUpperCase()}
+                            </option>
+                          )
                         )
-                      )
                     }
                   </select>
                 </>
