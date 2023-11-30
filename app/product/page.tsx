@@ -170,6 +170,10 @@ function Page() {
             },
             body: JSON.stringify({
               tx_id: tx.hash,
+              chain_type:
+                recipientData?.network === chain?.name
+                  ? "same_chain"
+                  : "cross_chain",
             }),
           }
         );
